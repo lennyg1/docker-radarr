@@ -8,6 +8,7 @@ name: Build
 on:
   schedule:
     - cron: '12 3 * * 3'
+  workflow_dispatch:
 
 jobs:
   build:
