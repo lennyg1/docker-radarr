@@ -54,9 +54,7 @@ The architectures supported by this image are:
 
 | Architecture | Available | Tag |
 | :----: | :----: | ---- |
-| x86-64 | ✅ | amd64-\<version tag\> |
-| arm64 | ✅ | arm64v8-\<version tag\> |
-| armhf | ❌ | |
+| armhf | ✅ | latest |
 
 ## Version Tags
 
@@ -65,8 +63,6 @@ This image provides various versions that are available via tags. Please read th
 | Tag | Available | Description |
 | :----: | :----: |--- |
 | latest | ✅ | Stable Radarr releases |
-| develop | ✅ | Radarr releases from their develop branch |
-| nightly | ✅ | Radarr releases from their nightly branch |
 ## Application Setup
 
 Access the webui at `<your-ip>:7878`, for more information check out [Radarr](https://github.com/Radarr/Radarr).
