@@ -6,7 +6,7 @@ ARG VERSION
 ARG RADARR_RELEASE
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV RADARR_BRANCH="develop"
+ENV RADARR_BRANCH="master"
 ENV XDG_CONFIG_HOME="/config/xdg"
 
 RUN apt update; apt upgrade -y; apt install -y jq curl sqlite3 libicu66 xmlstarlet mediainfo
