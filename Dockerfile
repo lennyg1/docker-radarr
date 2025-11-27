@@ -1,34 +1,40 @@
-# syntax=docker/dockerfile:1
-
-FROM ghcr.io/linuxserver/baseimage-ubuntu:arm32v7-focal-version-127ce7ef
+FROM ubuntu:24.04
 
 ARG VERSION
 ARG RADARR_RELEASE
+ARG RADARR_BRANCH="master"
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV RADARR_BRANCH="master"
+ENV RADARR_BRANCH="${RADARR_BRANCH}"
 ENV XDG_CONFIG_HOME="/config/xdg"
+ENV PUID=1000
+ENV PGID=1000
+ENV TZ=Europe/Amsterdam
 
-RUN apt update; apt upgrade -y; apt install -y jq curl sqlite3 libicu66 xmlstarlet mediainfo
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y ca-certificates tzdata curl jq sqlite3 xmlstarlet mediainfo gnupg2 apt-utils adduser coreutils && \
+    # pick the newest libicu package available on this platform
+    LIBICU="$(apt-cache pkgnames | grep -E '^libicu[0-9]+' | sort -V | tail -n1)" && \
+    if [ -n "$LIBICU" ]; then apt-get install -y "$LIBICU"; fi && \
+    mkdir -p /app/radarr/bin /config && \
+    # install gosu for safe user switch at runtime
+    curl -fsSL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/1.14/gosu-armhf" && \
+    chmod +x /usr/local/bin/gosu && gosu nobody true || true && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
+
 RUN mkdir -p /app/radarr/bin && \
-  if [ -z ${RADARR_RELEASE+x} ]; then \
-    RADARR_RELEASE=$(curl -sL "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/changes?runtime=netcore&os=linux" \
-    | jq -r '.[0].version'); \
+  if [ -z "${RADARR_RELEASE+x}" ]; then \
+    RADARR_RELEASE=$(curl -sL "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/changes?runtime=netcore&os=linux" | jq -r '.[0].version'); \
   fi && \
-  curl -o \
-    /tmp/radarr.tar.gz -L \
-    "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/updatefile?version=5.28.0.10274&os=linux&runtime=netcore&arch=arm" && \
-  tar xzf \
-    /tmp/radarr.tar.gz -C \
-    /app/radarr/bin --strip-components=1 && \
+  curl -o /tmp/radarr.tar.gz -L "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/updatefile?version=${RADARR_RELEASE}&os=linux&runtime=netcore&arch=arm" && \
+  tar xzf /tmp/radarr.tar.gz -C /app/radarr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${RADARR_BRANCH}" > /app/radarr/package_info && \
-  apt-get clean && \
-  rm -rf \
-    /app/radarr/bin/Radarr.Update \
-    /tmp/* \
-    /var/lib/apt/lists/* \
-    /var/tmp/*
+  rm -rf /tmp/*
 
-COPY root/ /
+COPY root/ /usr/local/bin/
+
 EXPOSE 7878
 VOLUME /config
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/app/radarr/bin/Radarr", "-nobrowser"]
