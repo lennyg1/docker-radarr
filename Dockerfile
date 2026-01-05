@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 ARG RADARR_BRANCH="master"
 ARG DEBIAN_FRONTEND=noninteractive
