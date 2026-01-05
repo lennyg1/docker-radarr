@@ -1,14 +1,12 @@
-FROM ubuntu:24.04
+FROM ubuntu:latest
 
-ARG VERSION
-ARG RADARR_RELEASE
 ARG RADARR_BRANCH="master"
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV RADARR_BRANCH="${RADARR_BRANCH}"
 ENV XDG_CONFIG_HOME="/config/xdg"
-ENV PUID=1000
-ENV PGID=1000
+ENV PUID=1001
+ENV PGID=1001
 ENV TZ=Europe/Amsterdam
 
 RUN apt-get update && apt-get upgrade -y && \
@@ -23,15 +21,14 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN mkdir -p /app/radarr/bin && \
-  if [ -z "${RADARR_RELEASE+x}" ]; then \
-    RADARR_RELEASE=$(curl -sL "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/changes?runtime=netcore&os=linux" | jq -r '.[0].version'); \
-  fi && \
+  RADARR_RELEASE=$(curl -sL "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/changes?runtime=netcore&os=linux" | jq -r '.[0].version'); \
   curl -o /tmp/radarr.tar.gz -L "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/updatefile?version=${RADARR_RELEASE}&os=linux&runtime=netcore&arch=arm" && \
   tar xzf /tmp/radarr.tar.gz -C /app/radarr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${RADARR_BRANCH}" > /app/radarr/package_info && \
   rm -rf /tmp/*
 
 COPY root/ /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 7878
 VOLUME /config
