@@ -25,7 +25,7 @@ RUN mkdir -p /app/radarr/bin && \
   curl -o /tmp/radarr.tar.gz -L "https://radarr.servarr.com/v1/update/${RADARR_BRANCH}/updatefile?version=${RADARR_RELEASE}&os=linux&runtime=netcore&arch=arm" && \
   tar xzf /tmp/radarr.tar.gz -C /app/radarr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${RADARR_BRANCH}" > /app/radarr/package_info && \
-  rm -rf /tmp/*
+  rm -rf /tmp/* /app/radarr/bin/Radarr.Update
 
 COPY root/ /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
