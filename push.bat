@@ -1,1 +1,1 @@
-docker buildx build . --platform linux/arm/v7 --tag dysje/radarr-arm32 --push
+docker buildx build . --platform linux/arm/v7 --tag dysje/radarr6-arm32 --push
