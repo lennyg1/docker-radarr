@@ -31,4 +31,4 @@ jobs:
           context: .
           platforms: linux/arm/v7
           push: true
-          tags: dysje/radarr6-arm32:latest
+          tags: dysje/radarr-arm32:latest
