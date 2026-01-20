@@ -18,12 +18,12 @@ fi
 
 # create user if missing
 if ! id -u radarr >/dev/null 2>&1; then
-  adduser --disabled-password --gecos "" --uid "${PUID}" --gid "${PGID}" --home /config radarr 2>/dev/null || \
-    useradd -u "${PUID}" -g "${PGID}" -M -s /usr/sbin/nologin -d /config radarr
+  adduser --disabled-password --gecos "" --uid "${PUID}" --gid "${PGID}" --home /app/config radarr 2>/dev/null || \
+    useradd -u "${PUID}" -g "${PGID}" -M -s /usr/sbin/nologin -d /app/config radarr
 fi
 
 # ensure permissions
-chown -R "${PUID}:${PGID}" /config /app/radarr || true
+chown -R "${PUID}:${PGID}" /app/config /app/radarr || true
 
 # run as radarr using gosu if present, fallback to su
 if command -v gosu >/dev/null 2>&1; then
